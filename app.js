@@ -1,0 +1,378 @@
+/* ============================================================
+   الكتاب المقدّس — Orthodox Bible Reader  (app logic)
+   Source: api.getbible.net  ·  translation: arabicsv (Van Dyck)
+   All dynamic text is rendered via textContent (no innerHTML) — XSS-safe.
+   ============================================================ */
+
+const TR = 'arabicsv';
+const API = (b, c) => `https://api.getbible.net/v2/${TR}/${b}/${c}.json`;
+const CACHE_PREFIX = `bible:${TR}:`;
+
+/* ---- Canon (book number = getbible index 1..66) ---- */
+const BOOKS = [
+  {n:1,name:'التكوين',ch:50,t:'ot'},        {n:2,name:'الخروج',ch:40,t:'ot'},
+  {n:3,name:'اللاويين',ch:27,t:'ot'},       {n:4,name:'العدد',ch:36,t:'ot'},
+  {n:5,name:'التثنية',ch:34,t:'ot'},        {n:6,name:'يشوع',ch:24,t:'ot'},
+  {n:7,name:'القضاة',ch:21,t:'ot'},         {n:8,name:'راعوث',ch:4,t:'ot'},
+  {n:9,name:'صموئيل الأول',ch:31,t:'ot'},   {n:10,name:'صموئيل الثاني',ch:24,t:'ot'},
+  {n:11,name:'الملوك الأول',ch:22,t:'ot'},  {n:12,name:'الملوك الثاني',ch:25,t:'ot'},
+  {n:13,name:'أخبار الأيام الأول',ch:29,t:'ot'},{n:14,name:'أخبار الأيام الثاني',ch:36,t:'ot'},
+  {n:15,name:'عزرا',ch:10,t:'ot'},          {n:16,name:'نحميا',ch:13,t:'ot'},
+  {n:17,name:'أستير',ch:10,t:'ot'},         {n:18,name:'أيوب',ch:42,t:'ot'},
+  {n:19,name:'المزامير',ch:150,t:'ot'},     {n:20,name:'الأمثال',ch:31,t:'ot'},
+  {n:21,name:'الجامعة',ch:12,t:'ot'},       {n:22,name:'نشيد الأنشاد',ch:8,t:'ot'},
+  {n:23,name:'إشعياء',ch:66,t:'ot'},        {n:24,name:'إرميا',ch:52,t:'ot'},
+  {n:25,name:'مراثي إرميا',ch:5,t:'ot'},    {n:26,name:'حزقيال',ch:48,t:'ot'},
+  {n:27,name:'دانيال',ch:12,t:'ot'},        {n:28,name:'هوشع',ch:14,t:'ot'},
+  {n:29,name:'يوئيل',ch:3,t:'ot'},          {n:30,name:'عاموس',ch:9,t:'ot'},
+  {n:31,name:'عوبديا',ch:1,t:'ot'},         {n:32,name:'يونان',ch:4,t:'ot'},
+  {n:33,name:'ميخا',ch:7,t:'ot'},           {n:34,name:'ناحوم',ch:3,t:'ot'},
+  {n:35,name:'حبقوق',ch:3,t:'ot'},          {n:36,name:'صفنيا',ch:3,t:'ot'},
+  {n:37,name:'حجي',ch:2,t:'ot'},            {n:38,name:'زكريا',ch:14,t:'ot'},
+  {n:39,name:'ملاخي',ch:4,t:'ot'},
+  {n:40,name:'متى',ch:28,t:'nt'},           {n:41,name:'مرقس',ch:16,t:'nt'},
+  {n:42,name:'لوقا',ch:24,t:'nt'},          {n:43,name:'يوحنا',ch:21,t:'nt'},
+  {n:44,name:'أعمال الرسل',ch:28,t:'nt'},   {n:45,name:'رومية',ch:16,t:'nt'},
+  {n:46,name:'كورنثوس الأولى',ch:16,t:'nt'},{n:47,name:'كورنثوس الثانية',ch:13,t:'nt'},
+  {n:48,name:'غلاطية',ch:6,t:'nt'},         {n:49,name:'أفسس',ch:6,t:'nt'},
+  {n:50,name:'فيلبي',ch:4,t:'nt'},          {n:51,name:'كولوسي',ch:4,t:'nt'},
+  {n:52,name:'تسالونيكي الأولى',ch:5,t:'nt'},{n:53,name:'تسالونيكي الثانية',ch:3,t:'nt'},
+  {n:54,name:'تيموثاوس الأولى',ch:6,t:'nt'},{n:55,name:'تيموثاوس الثانية',ch:4,t:'nt'},
+  {n:56,name:'تيطس',ch:3,t:'nt'},           {n:57,name:'فليمون',ch:1,t:'nt'},
+  {n:58,name:'العبرانيين',ch:13,t:'nt'},    {n:59,name:'يعقوب',ch:5,t:'nt'},
+  {n:60,name:'بطرس الأولى',ch:5,t:'nt'},    {n:61,name:'بطرس الثانية',ch:3,t:'nt'},
+  {n:62,name:'يوحنا الأولى',ch:5,t:'nt'},   {n:63,name:'يوحنا الثانية',ch:1,t:'nt'},
+  {n:64,name:'يوحنا الثالثة',ch:1,t:'nt'},  {n:65,name:'يهوذا',ch:1,t:'nt'},
+  {n:66,name:'الرؤيا',ch:22,t:'nt'},
+];
+
+/* Coptic-Orthodox deuterocanon — listed for canon completeness.
+   arabicsv (Protestant) lacks them, so they're flagged "coming". */
+const DEUTERO = [
+  'طوبيا','يهوديت','الحكمة (حكمة سليمان)','يشوع بن سيراخ',
+  'باروخ','رسالة إرميا','زيادات أستير','زيادات دانيال',
+  'المكابيين الأول','المكابيين الثاني',
+];
+
+const VOTD = [
+  [43,3,16],[19,23,1],[45,8,28],[50,4,13],[23,40,31],[20,3,5],
+  [40,11,28],[46,13,4],[19,46,1],[24,29,11],[6,1,9],[40,6,33],
+  [50,4,6],[19,118,24],[45,12,2],[59,1,2],[62,4,8],[40,5,16],
+];
+
+/* ---- helpers ---- */
+const AR_DIG = '٠١٢٣٤٥٦٧٨٩';
+const toAr   = n => String(n).replace(/\d/g, d => AR_DIG[d]);
+const toLat  = s => s.replace(/[٠-٩]/g, d => AR_DIG.indexOf(d));
+const TASHKEEL = /[ً-ْٰ]/g;
+const norm = s => toLat(s).replace(TASHKEEL,'')
+  .replace(/[إأآٱا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه')
+  .replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/[ـ\s]/g,'')
+  .replace(/^ال/,'').toLowerCase();
+const bookByN = n => BOOKS.find(b => b.n === +n);
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* tiny safe DOM builder — text always via textContent */
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  if(attrs) for(const [k,v] of Object.entries(attrs)){
+    if(v==null) continue;
+    if(k==='class') n.className = v;
+    else if(k==='text') n.textContent = v;
+    else n.setAttribute(k, v);
+  }
+  for(const kid of kids){ if(kid==null) continue; n.append(kid.nodeType ? kid : document.createTextNode(String(kid))); }
+  return n;
+}
+
+const LS = {
+  get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}},
+};
+
+/* ---- theme ---- */
+function initTheme(){
+  let t = LS.get('theme', null);
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.body.dataset.theme = t;
+}
+$('#themeBtn').onclick = () => {
+  const t = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.body.dataset.theme = t; LS.set('theme', t);
+};
+
+/* ---- font scale ---- */
+function applyFont(){
+  const s = LS.get('fontScale', 1);
+  document.documentElement.style.setProperty('--reader-scale', s);
+  $('#fontVal').textContent = toAr(Math.round(s*100)) + '٪';
+}
+$('#fontBtn').onclick = () => { const s=$('#fontSheet'); s.hidden=!s.hidden; };
+$('#fontPlus').onclick  = () => { const s=Math.min(1.8, LS.get('fontScale',1)+0.1); LS.set('fontScale',+s.toFixed(2)); applyFont(); };
+$('#fontMinus').onclick = () => { const s=Math.max(0.8, LS.get('fontScale',1)-0.1); LS.set('fontScale',+s.toFixed(2)); applyFont(); };
+
+/* ---- sidebar ---- */
+function openSidebar(o){ $('#sidebar').classList.toggle('open',o); $('#scrim').classList.toggle('show',o); }
+$('#menuBtn').onclick = () => openSidebar(true);
+$('#closeSidebar').onclick = () => openSidebar(false);
+$('#scrim').onclick = () => openSidebar(false);
+
+function buildSidebar(){
+  const nav = $('#bookNav');
+  const frag = document.createDocumentFragment();
+  const addSection = (label, builder) => {
+    frag.append(el('div', {class:'testament', text:label}));
+    builder();
+  };
+  const bookBtn = b => el('button', {class:'book-item', 'data-n':b.n},
+      el('span', {text:b.name}),
+      el('span', {class:'bk-ch', text:`${toAr(b.ch)} إصحاح`}));
+  const apocBtn = name => el('button', {class:'book-item apoc', 'data-apoc':'1'},
+      el('span', {text:name}),
+      el('span', {class:'bk-ch', text:'قريباً'}));
+
+  addSection('العهد القديم', () => BOOKS.filter(b=>b.t==='ot').forEach(b=>frag.append(bookBtn(b))));
+  addSection('الأسفار القانونية الثانية', () => DEUTERO.forEach(d=>frag.append(apocBtn(d))));
+  addSection('العهد الجديد', () => BOOKS.filter(b=>b.t==='nt').forEach(b=>frag.append(bookBtn(b))));
+
+  nav.replaceChildren(frag);
+  nav.onclick = e => {
+    const it = e.target.closest('.book-item'); if(!it) return;
+    if(it.dataset.apoc){ toast('هذا السفر من الأسفار القانونية الثانية — النص الكامل سيُضاف من نسخة أرثوذكسية معتمدة قريباً.'); return; }
+    openSidebar(false);
+    location.hash = `#/book/${it.dataset.n}`;
+  };
+}
+$('#bookFilter').addEventListener('input', e => {
+  const q = norm(e.target.value);
+  $$('#bookNav .book-item').forEach(it => {
+    const name = it.querySelector('span').textContent;
+    it.style.display = (!q || norm(name).includes(q)) ? '' : 'none';
+  });
+});
+
+/* ---- data fetch (with cache) ---- */
+async function getChapter(b, c){
+  const key = `${CACHE_PREFIX}${b}:${c}`;
+  const cached = LS.get(key, null);
+  if(cached) return cached;
+  const res = await fetch(API(b,c));
+  if(!res.ok) throw new Error('network');
+  const data = await res.json();
+  let verses = data.verses;
+  if(verses && !Array.isArray(verses)) verses = Object.values(verses);
+  verses = (verses||[]).map(v => ({ v:+v.verse, text:(v.text||'').trim() }));
+  LS.set(key, verses);
+  return verses;
+}
+
+/* ---- views ---- */
+const VIEWS = ['#home','#chapters','#reader','#loading','#errorState'];
+function show(id){ VIEWS.forEach(v => $(v).hidden = (v !== id)); }
+
+function renderChapters(b){
+  $('#chaptersTitle').textContent = b.name;
+  const read = LS.get('readSet', {});
+  const frag = document.createDocumentFragment();
+  for(let i=1;i<=b.ch;i++){
+    frag.append(el('button', {class:'ch-cell'+(read[`${b.n}:${i}`]?' read':''), 'data-c':i, text:toAr(i)}));
+  }
+  const g = $('#chapterGrid');
+  g.replaceChildren(frag);
+  g.onclick = e => { const c=e.target.closest('.ch-cell'); if(c) location.hash=`#/read/${b.n}/${c.dataset.c}`; };
+  show('#chapters');
+  scrollTo(0,0);
+}
+
+async function renderReader(b, c){
+  c = Math.min(Math.max(1,+c), b.ch);
+  $('#readerTitle').textContent = `${b.name} ${toAr(c)}`;
+  show('#loading');
+  try{
+    const verses = await getChapter(b.n, c);
+    const box = $('#verses');
+    const frag = document.createDocumentFragment();
+    verses.forEach(v => {
+      const span = el('span', {class:'verse', 'data-v':v.v},
+        el('span', {class:'vnum', text:toAr(v.v)}), v.text);
+      frag.append(span, document.createTextNode(' '));
+    });
+    box.replaceChildren(frag);
+    box.dataset.book = b.n; box.dataset.ch = c;
+
+    $('#prevCh').disabled = (c<=1);
+    $('#nextCh').disabled = (c>=b.ch);
+
+    const read = LS.get('readSet', {}); read[`${b.n}:${c}`]=1; LS.set('readSet', read);
+    LS.set('lastPos', {b:b.n,c,name:`${b.name} ${toAr(c)}`});
+    updateContinue();
+
+    show('#reader');
+    scrollTo(0,0);
+  }catch(err){
+    $('#errorMsg').textContent = navigator.onLine
+      ? 'تعذّر تحميل الإصحاح. حاول مرة أخرى.'
+      : 'لا يوجد اتصال بالإنترنت. النص يُحمّل مباشرةً من المصدر.';
+    show('#errorState');
+    $('#retryBtn').onclick = () => renderReader(b,c);
+  }
+}
+
+/* verse interactions */
+$('#verses').addEventListener('click', e => {
+  const v = e.target.closest('.verse'); if(!v) return;
+  $$('.verse.sel').forEach(x=>x.classList.remove('sel'));
+  v.classList.add('sel');
+  const box = $('#verses');
+  const b = bookByN(box.dataset.book);
+  const ref = `${b.name} ${toAr(box.dataset.ch)}:${toAr(v.dataset.v)}`;
+  const text = (v.textContent || '').replace(/^\s*\S+\s/,'').trim();
+  shareVerse(`«${text}» (${ref})`);
+});
+
+async function shareVerse(payload){
+  try{ if(navigator.share){ await navigator.share({text:payload}); return; } }catch{}
+  try{ await navigator.clipboard.writeText(payload); toast('تم نسخ الآية ✓'); }
+  catch{ toast('اضغط مطوّلاً لتحديد الآية ونسخها'); }
+}
+
+/* nav buttons */
+$('#prevCh').onclick = () => { const box=$('#verses'); location.hash=`#/read/${box.dataset.book}/${+box.dataset.ch-1}`; };
+$('#nextCh').onclick = () => { const box=$('#verses'); location.hash=`#/read/${box.dataset.book}/${+box.dataset.ch+1}`; };
+addEventListener('keydown', e => {
+  if($('#reader').hidden) return;
+  if(e.key==='ArrowLeft' && !$('#nextCh').disabled) $('#nextCh').click();
+  if(e.key==='ArrowRight'&& !$('#prevCh').disabled) $('#prevCh').click();
+});
+
+/* ---- router ---- */
+function route(){
+  const h = location.hash.replace(/^#\/?/,'');
+  const [view, a, b] = h.split('/');
+  if(view==='book' && bookByN(a)) return renderChapters(bookByN(a));
+  if(view==='read' && bookByN(a)) return renderReader(bookByN(a), b||1);
+  show('#home'); scrollTo(0,0);
+}
+addEventListener('hashchange', route);
+
+$('#chaptersBack').onclick = () => openSidebar(true);
+$('#readerBack').onclick   = () => { const box=$('#verses'); location.hash=`#/book/${box.dataset.book}`; };
+$('#brandHome').onclick = e => { e.preventDefault(); location.hash=''; };
+$('#browseBtn').onclick = () => openSidebar(true);
+
+/* ---- continue reading ---- */
+function updateContinue(){
+  const last = LS.get('lastPos', null);
+  const btn = $('#continueBtn');
+  if(last){ btn.hidden=false; btn.textContent=`متابعة القراءة · ${last.name}`; btn.onclick=()=>location.hash=`#/read/${last.b}/${last.c}`; }
+  else btn.hidden=true;
+}
+
+/* ---- verse of the day ---- */
+async function loadVOTD(){
+  const day = Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
+  const [b,c,v] = VOTD[day % VOTD.length];
+  try{
+    const verses = await getChapter(b,c);
+    const found = verses.find(x=>x.v===v) || verses[0];
+    $('#votdText').textContent = `«${found.text}»`;
+    $('#votdRef').textContent = `${bookByN(b).name} ${toAr(c)}:${toAr(found.v)}`;
+  }catch{
+    $('#votdText').textContent = '«لِأَنَّهُ هَكَذَا أَحَبَّ اللهُ الْعَالَمَ حَتَّى بَذَلَ ابْنَهُ الْوَحِيدَ، لِكَيْ لَا يَهْلِكَ كُلُّ مَنْ يُؤْمِنُ بِهِ بَلْ تَكُونُ لَهُ الْحَيَاةُ الْأَبَدِيَّةُ.»';
+    $('#votdRef').textContent = 'يوحنا ٣:١٦';
+  }
+}
+$('#randomBtn').onclick = async () => {
+  const b = BOOKS[Math.floor(Math.random()*BOOKS.length)];
+  const c = 1+Math.floor(Math.random()*b.ch);
+  toast('…جارٍ الاختيار');
+  try{
+    const verses = await getChapter(b.n,c);
+    const v = verses[Math.floor(Math.random()*verses.length)];
+    $('#votdText').textContent = `«${v.text}»`;
+    $('#votdRef').textContent = `${b.name} ${toAr(c)}:${toAr(v.v)}`;
+    $('#toast').hidden=true;
+  }catch{ toast('تعذّر الاختيار، حاول تاني'); }
+};
+
+/* quicklinks */
+$('#quicklinks').addEventListener('click', e => {
+  const btn = e.target.closest('[data-go]'); if(!btn) return;
+  const [b,c] = btn.dataset.go.split('.');
+  location.hash = `#/read/${b}/${c}`;
+});
+
+/* ---- search / go-to ---- */
+const sOverlay=$('#searchOverlay'), sInput=$('#searchInput'), sRes=$('#searchResults');
+function openSearch(o){ sOverlay.hidden=!o; if(o){ sInput.value=''; sRes.replaceChildren(); setTimeout(()=>sInput.focus(),50);} }
+$('#searchBtn').onclick=()=>openSearch(true);
+$('#searchClose').onclick=()=>openSearch(false);
+sOverlay.addEventListener('click', e=>{ if(e.target===sOverlay) openSearch(false); });
+addEventListener('keydown', e=>{ if(e.key==='Escape') openSearch(false); });
+
+function parseRef(q){
+  const m = toLat(q.trim()).match(/^(.+?)\s*(\d+)\s*[:،.\s]?\s*(\d+)?\s*$/);
+  if(!m) return null;
+  const bq = norm(m[1]); if(!bq) return null;
+  const book = BOOKS.find(b => { const bn=norm(b.name); return bn===bq||bn.includes(bq)||bq.includes(bn); });
+  if(!book) return null;
+  return { book, c:Math.min(+m[2],book.ch), v:m[3]?+m[3]:null };
+}
+
+function searchCached(q){
+  const nq = norm(q); if(nq.length<2) return [];
+  const out=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i); if(!k.startsWith(CACHE_PREFIX)) continue;
+    const parts=k.split(':'); const b=+parts[2], c=+parts[3];
+    const verses=LS.get(k,[]);
+    for(const v of verses){
+      if(norm(v.text).includes(nq)){
+        out.push({b,c,v:v.v,text:v.text});
+        if(out.length>=40) return out;
+      }
+    }
+  }
+  return out;
+}
+
+function srItem(go, refLabel, body){
+  return el('button', {class:'sr-item', 'data-go':go},
+    el('span', {class:'sr-ref', text:refLabel}), body);
+}
+
+sInput.addEventListener('input', () => {
+  const q = sInput.value.trim();
+  const frag = document.createDocumentFragment();
+  if(!q){ sRes.replaceChildren(); $('#searchHint').textContent='اكتب اسم سفر ورقم الإصحاح للانتقال فوراً، أو كلمة للبحث داخل ما قرأته.'; return; }
+  const ref = parseRef(q);
+  if(ref){
+    const label = `${ref.book.name} ${toAr(ref.c)}${ref.v?(':'+toAr(ref.v)):''}`;
+    frag.append(srItem(`${ref.book.n}/${ref.c}`, 'انتقال ↵', label));
+  }
+  const hits = searchCached(q);
+  hits.forEach(h => {
+    const ref2 = `${bookByN(h.b).name} ${toAr(h.c)}:${toAr(h.v)}`;
+    frag.append(srItem(`${h.b}/${h.c}`, ref2, h.text));
+  });
+  $('#searchHint').textContent = hits.length
+    ? `${toAr(hits.length)} نتيجة داخل ما قرأته`
+    : (ref ? 'اضغط للانتقال' : 'البحث النصّي يشمل الأسفار اللي فتحتها. للبحث الشامل افتح السفر أولاً.');
+  sRes.replaceChildren(frag);
+});
+sRes.addEventListener('click', e=>{
+  const it=e.target.closest('.sr-item'); if(!it) return;
+  openSearch(false);
+  location.hash = `#/read/${it.dataset.go}`;
+});
+sInput.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ const first=sRes.querySelector('.sr-item'); if(first) first.click(); }
+});
+
+/* ---- toast ---- */
+let toastT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+
+/* ---- boot ---- */
+initTheme(); applyFont(); buildSidebar(); updateContinue(); loadVOTD(); route();
