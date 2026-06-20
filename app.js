@@ -168,7 +168,7 @@ async function getChapter(b, c){
 }
 
 /* ---- views ---- */
-const VIEWS = ['#home','#chapters','#reader','#loading','#errorState'];
+const VIEWS = ['#home','#chapters','#reader','#daily','#loading','#errorState'];
 function show(id){ VIEWS.forEach(v => $(v).hidden = (v !== id)); }
 
 function renderChapters(b){
@@ -252,6 +252,7 @@ function route(){
   const [view, a, b] = h.split('/');
   if(view==='book' && bookByN(a)) return renderChapters(bookByN(a));
   if(view==='read' && bookByN(a)) return renderReader(bookByN(a), b||1);
+  if(view==='daily') return showDaily();
   show('#home'); scrollTo(0,0);
 }
 addEventListener('hashchange', route);
@@ -370,9 +371,82 @@ sInput.addEventListener('keydown', e=>{
   if(e.key==='Enter'){ const first=sRes.querySelector('.sr-item'); if(first) first.click(); }
 });
 
+/* ---- daily readings (Katameros, same-origin JSON; auto-updated by CI) ---- */
+let dailyData = null;
+async function getDaily(){
+  if(dailyData) return dailyData;
+  const res = await fetch('./data/reading-today.json', {cache:'no-cache'});
+  if(!res.ok) throw new Error('daily');
+  dailyData = await res.json();
+  return dailyData;
+}
+function htmlToText(html){
+  if(!html) return '';
+  try{ return new DOMParser().parseFromString(html,'text/html').body.textContent.replace(/\n{3,}/g,'\n\n').trim(); }
+  catch{ return html.replace(/<[^>]+>/g,'').trim(); }
+}
+const isSynax = t => (t||'').includes('سنكسار');
+
+async function loadDailyTeaser(){
+  try{
+    const d = await getDaily();
+    if(d.copticDate) $('#dailyDate').textContent = `قطمارس · ${d.copticDate}`;
+    let saint=null;
+    (d.sections||[]).forEach(s=>(s.subSections||[]).forEach(sub=>{
+      if(isSynax(sub.title)) (sub.readings||[]).forEach(r=>{ if(!saint && r.title) saint=r.title.trim(); });
+    }));
+    if(saint) $('#saintName').textContent = saint;
+  }catch{ /* file may not exist offline */ }
+}
+
+function renderDaily(d){
+  const body = $('#dailyBody'); body.replaceChildren();
+  $('#copticDate').textContent = d.copticDate ? `التاريخ القبطي · ${d.copticDate}` : '';
+  (d.sections||[]).forEach((sec,i)=>{
+    const wrap = el('div', {class:'dr-section'+(i===0?' open':'')});
+    const head = el('button', {class:'dr-section-head'}, el('span',{text:sec.title||''}), el('span',{class:'chev',text:'‹'}));
+    head.onclick = () => wrap.classList.toggle('open');
+    const inner = el('div', {class:'dr-section-body'});
+    (sec.subSections||[]).forEach(sub=>{
+      const subEl = el('div', {class:'dr-sub'});
+      if(sub.title) subEl.append(el('div',{class:'dr-sub-title',text:sub.title}));
+      const syn = isSynax(sub.title);
+      (sub.readings||[]).forEach(r=>{
+        const hasPassages = r.passages && r.passages.length;
+        if(syn || (!hasPassages && r.html)){
+          if(r.title) subEl.append(el('div',{class:'dr-synax-title',text:r.title.trim()}));
+          const t = htmlToText(r.html);
+          if(t) subEl.append(el('div',{class:'dr-synax',text:t}));
+        } else {
+          if(r.introduction) subEl.append(el('div',{class:'dr-intro',text:htmlToText(r.introduction)}));
+          (r.passages||[]).forEach(p=>{
+            subEl.append(el('div',{class:'dr-ref',text:`${p.bookTranslation||''} ${p.ref||''}`.trim()}));
+            const vbox = el('div',{class:'dr-verses'});
+            (p.verses||[]).forEach(v=> vbox.append(el('span',{class:'vnum',text:toAr(v.number)}), (v.text||'').trim()+' '));
+            subEl.append(vbox);
+          });
+          if(r.conclusion) subEl.append(el('div',{class:'dr-intro',text:htmlToText(r.conclusion)}));
+        }
+      });
+      inner.append(subEl);
+    });
+    wrap.append(head, inner);
+    body.append(wrap);
+  });
+}
+
+async function showDaily(){
+  show('#loading');
+  try{ renderDaily(await getDaily()); show('#daily'); scrollTo(0,0); }
+  catch{ $('#errorMsg').textContent='تعذّر تحميل قراءات اليوم.'; show('#errorState'); $('#retryBtn').onclick=()=>showDaily(); }
+}
+$('#dailyCard').onclick = () => location.hash='#/daily';
+$('#saintCard').onclick = () => location.hash='#/daily';
+$('#dailyBack').onclick  = () => location.hash='';
+
 /* ---- toast ---- */
 let toastT;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
 
 /* ---- boot ---- */
-initTheme(); applyFont(); buildSidebar(); updateContinue(); loadVOTD(); route();
+initTheme(); applyFont(); buildSidebar(); updateContinue(); loadVOTD(); loadDailyTeaser(); route();

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=2" />
 </head>
 <body data-theme="light">
 
@@ -72,6 +72,19 @@
         <cite class="votd-ref" id="votdRef"></cite>
       </article>
 
+      <div class="today-row" id="todayRow">
+        <button class="today-card" id="dailyCard">
+          <span class="tc-label">📖 قراءة اليوم · القطمارس</span>
+          <span class="tc-main" id="dailyDate">قراءات اليوم</span>
+          <span class="tc-sub">العشية · باكر · القُدّاس</span>
+        </button>
+        <button class="today-card" id="saintCard">
+          <span class="tc-label">✦ قديس اليوم · السنكسار</span>
+          <span class="tc-main" id="saintName">سنكسار اليوم</span>
+          <span class="tc-sub">سِيَر وتذكارات اليوم</span>
+        </button>
+      </div>
+
       <div class="home-actions">
         <button class="primary-btn" id="continueBtn" hidden></button>
         <button class="ghost-btn" id="browseBtn">تصفّح الأسفار</button>
@@ -111,6 +124,16 @@
         <button class="nav-btn" id="prevCh">الإصحاح السابق ›</button>
         <button class="nav-btn" id="nextCh">‹ الإصحاح التالي</button>
       </div>
+    </section>
+
+    <!-- Daily readings (Katameros) -->
+    <section class="daily" id="daily" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="dailyBack">‹ الرئيسية</button>
+        <h2>قراءات اليوم</h2>
+      </div>
+      <p class="coptic-date" id="copticDate"></p>
+      <div class="daily-body" id="dailyBody"></div>
     </section>
 
     <!-- Loading / error -->
@@ -153,6 +176,6 @@
     <p class="footer-note">نور الكلمة · نسخة أولى — للقراءة الشخصية والكنسية.</p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
