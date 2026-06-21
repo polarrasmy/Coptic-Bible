@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body data-theme="light">
 
@@ -106,6 +106,19 @@
         </button>
       </div>
 
+      <div class="today-row" id="discoverRow">
+        <button class="today-card" id="theologyCard">
+          <span class="tc-label">✝ العقيدة الأرثوذكسية</span>
+          <span class="tc-main">تعرّف على إيمانك</span>
+          <span class="tc-sub">الثالوث · التجسّد · الأسرار · المجامع</span>
+        </button>
+        <button class="today-card" id="libraryCard">
+          <span class="tc-label">📚 المكتبة</span>
+          <span class="tc-main">كتب · تفاسير · آبائيات</span>
+          <span class="tc-sub">روابط لمصادر معتمدة</span>
+        </button>
+      </div>
+
       <div class="home-actions">
         <button class="primary-btn" id="continueBtn" hidden></button>
         <button class="ghost-btn" id="browseBtn">تصفّح الأسفار</button>
@@ -157,6 +170,26 @@
       <div class="daily-body" id="dailyBody"></div>
     </section>
 
+    <!-- Theology (original short explainers + verse links + authoritative source) -->
+    <section class="theology" id="theology" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="theologyBack">‹ الرئيسية</button>
+        <h2>العقيدة الأرثوذكسية</h2>
+      </div>
+      <p class="section-note">مقدّمات مبسّطة للشباب — الآيات تفتح في القارئ. للتعمّق راجِع المصادر المعتمدة وأب اعترافك. 🕯️</p>
+      <div class="theology-body" id="theologyBody"></div>
+    </section>
+
+    <!-- Library (curated directory of external, rights-cleared sources — we link, we don't host) -->
+    <section class="library" id="library" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="libraryBack">‹ الرئيسية</button>
+        <h2>المكتبة</h2>
+      </div>
+      <p class="section-note">دليل منسّق لمصادر معتمدة — <b>نوصّل ولا نستضيف</b> احتراماً لحقوق المؤلفين. الروابط تفتح في موقعها الأصلي ↗</p>
+      <div class="library-body" id="libraryBody"></div>
+    </section>
+
     <!-- Loading / error -->
     <div class="state" id="loading" hidden><div class="spinner"></div><span>…جارٍ التحميل</span></div>
     <div class="state error" id="errorState" hidden>
@@ -197,6 +230,6 @@
     <p class="footer-note">نور الكلمة · نسخة أولى — للقراءة الشخصية والكنسية.</p>
   </footer>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

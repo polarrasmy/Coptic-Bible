@@ -168,7 +168,7 @@ async function getChapter(b, c){
 }
 
 /* ---- views ---- */
-const VIEWS = ['#home','#chapters','#reader','#daily','#loading','#errorState'];
+const VIEWS = ['#home','#chapters','#reader','#daily','#theology','#library','#loading','#errorState'];
 function show(id){ VIEWS.forEach(v => $(v).hidden = (v !== id)); }
 
 function renderChapters(b){
@@ -253,6 +253,8 @@ function route(){
   if(view==='book' && bookByN(a)) return renderChapters(bookByN(a));
   if(view==='read' && bookByN(a)) return renderReader(bookByN(a), b||1);
   if(view==='daily') return showDaily();
+  if(view==='theology') return showTheology();
+  if(view==='library') return showLibrary();
   show('#home'); scrollTo(0,0);
 }
 addEventListener('hashchange', route);
@@ -444,6 +446,96 @@ async function showDaily(){
 $('#dailyCard').onclick = () => location.hash='#/daily';
 $('#saintCard').onclick = () => location.hash='#/daily';
 $('#dailyBack').onclick  = () => location.hash='';
+
+/* ---- theology (العقيدة): original short explainers + verse links + authoritative source ---- */
+const THEOLOGY = [
+  { title:'الثالوث القدّوس',
+    intro:'اللهُ واحدٌ في جوهره، مثلّثُ الأقانيم: الآبُ والابنُ والروحُ القُدُس — ثلاثةُ أقانيمَ متساوون في الجوهرِ والمجدِ والأزلية، إلهٌ واحدٌ لا ثلاثةُ آلهة.',
+    verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ١:١',b:43,c:1},{l:'٢كورنثوس ١٣:١٤',b:47,c:13}] },
+  { title:'سرّ التجسّد',
+    intro:'ابنُ اللهِ الكلمةُ صار إنساناً كاملاً من غيرِ أن يتغيّرَ لاهوتُه؛ اتّحدَ اللاهوتُ بالناسوتِ اتّحاداً بغيرِ اختلاطٍ ولا امتزاجٍ ولا تغيير — طبيعةٌ واحدةٌ من طبيعتين (بحسبِ الإيمانِ القبطيِّ الأرثوذكسي)، إلهٌ كاملٌ وإنسانٌ كامل.',
+    verses:[{l:'يوحنا ١:١٤',b:43,c:1},{l:'فيلبي ٢:٦',b:50,c:2},{l:'١تيموثاوس ٣:١٦',b:54,c:3}] },
+  { title:'الفداء والخلاص',
+    intro:'بصليبِ المسيحِ وقيامتِه افتدانا من الخطيةِ والموتِ وصالحَنا مع الآب. الخلاصُ نعمةٌ تُقبَلُ بالإيمانِ العاملِ بالمحبة، ونحياهُ في الكنيسةِ وأسرارِها.',
+    verses:[{l:'يوحنا ٣:١٦',b:43,c:3},{l:'رومية ٥:٨',b:45,c:5},{l:'أفسس ٢:٨',b:49,c:2}] },
+  { title:'الأسرار السبعة',
+    intro:'الأسرارُ المقدّسةُ سبعة: المعموديةُ، الميرونُ، الإفخارستيا (التناوُل)، التوبةُ والاعترافُ، مسحةُ المرضى، الكهنوتُ، الزيجة — وسائطُ نعمةٍ منظورةٌ لبركةٍ غيرِ منظورة.',
+    verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ٦:٥٤',b:43,c:6},{l:'يعقوب ٥:١٤',b:59,c:5}] },
+  { title:'المجامع المسكونية',
+    intro:'تعترفُ الكنيسةُ القبطيةُ الأرثوذكسيةُ بالمجامعِ المسكونيةِ الثلاثةِ الأولى: نيقية (٣٢٥م) ضدّ آريوس، والقسطنطينية (٣٨١م)، وأفسس (٤٣١م) ضدّ نسطور — التي ثبّتت الإيمانَ بلاهوتِ الابنِ والروحِ القدسِ ووحدانيةِ شخصِ المسيح، ومنها قانونُ الإيمان.',
+    verses:[{l:'يوحنا ١٧:٢١',b:43,c:17},{l:'أفسس ٤:٥',b:49,c:4}] },
+  { title:'الكتاب المقدّس والوحي',
+    intro:'الكتابُ المقدّسُ كلمةُ اللهِ الموحى بها: أسفارُ العهدِ القديمِ والجديدِ والأسفارِ القانونيةِ الثانية، تقرؤها الكنيسةُ في ضوءِ التقليدِ الرسوليِّ وتفسيرِ الآباء.',
+    verses:[{l:'٢تيموثاوس ٣:١٦',b:55,c:3},{l:'٢بطرس ١:٢١',b:61,c:1}] },
+];
+
+function renderTheology(){
+  const body=$('#theologyBody'); const frag=document.createDocumentFragment();
+  THEOLOGY.forEach((t,i)=>{
+    const wrap=el('div',{class:'th-topic'+(i===0?' open':'')});
+    const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
+    head.onclick=()=>wrap.classList.toggle('open');
+    const inner=el('div',{class:'th-body'});
+    inner.append(el('div',{class:'th-intro',text:t.intro}));
+    const vrow=el('div',{class:'th-verses'});
+    t.verses.forEach(v=>{ const btn=el('button',{text:v.l}); btn.onclick=()=>{ location.hash=`#/read/${v.b}/${v.c}`; }; vrow.append(btn); });
+    inner.append(vrow);
+    inner.append(el('a',{class:'th-more',href:'https://st-takla.org',target:'_blank',rel:'noopener noreferrer',text:'اقرأ أكثر من مصدر معتمد ↗'}));
+    wrap.append(head,inner); frag.append(wrap);
+  });
+  body.replaceChildren(frag);
+}
+function showTheology(){ renderTheology(); show('#theology'); scrollTo(0,0); }
+
+/* ---- library (المكتبة): curated external sources — we link, we don't host ---- */
+const LIBRARY = [
+  { cat:'📖 التفاسير', items:[
+    {title:'تفسير الكتاب المقدّس — أبونا تادرس يعقوب ملطي', author:'القمص تادرس يعقوب ملطي', src:'coptic-treasures.com', url:'https://coptic-treasures.com'},
+    {title:'تفاسير الكتاب المقدّس', author:'مكتبة الأنبا تكلا', src:'st-takla.org', url:'https://st-takla.org'},
+  ]},
+  { cat:'📜 آبائيّات وكتابات الآباء', items:[
+    {title:'كتابات آباء الكنيسة', author:'كنوز قبطية', src:'coptic-treasures.com', url:'https://coptic-treasures.com'},
+    {title:'Church Fathers (نصوص مجال عام)', author:'CCEL', src:'ccel.org', url:'https://ccel.org/fathers'},
+  ]},
+  { cat:'✝ العقيدة والدفاعيّات', items:[
+    {title:'اللاهوت العقيدي والدفاعيات', author:'مكتبة الأنبا تكلا', src:'st-takla.org', url:'https://st-takla.org'},
+  ]},
+  { cat:'👥 سِيَر القديسين', items:[
+    {title:'السنكسار وسِيَر القديسين', author:'مكتبة الأنبا تكلا', src:'st-takla.org', url:'https://st-takla.org'},
+    {title:'قديس اليوم — داخل نور الكلمة', author:'من السنكسار', src:'داخلي', url:'#/daily'},
+  ]},
+  { cat:'🕊 روحيّات وكتب عامة', items:[
+    {title:'المكتبة المسيحية الحرة', author:'مكتبة عامة', src:'christianlib.com', url:'https://christianlib.com'},
+  ]},
+];
+
+function renderLibrary(){
+  const body=$('#libraryBody'); const frag=document.createDocumentFragment();
+  LIBRARY.forEach(cat=>{
+    const sec=el('div',{class:'lib-cat'});
+    sec.append(el('div',{class:'lib-cat-title',text:cat.cat}));
+    const grid=el('div',{class:'lib-grid'});
+    cat.items.forEach(it=>{
+      const internal=it.url.charAt(0)==='#';
+      const card=el('a',{class:'lib-item',href:it.url},
+        el('span',{class:'li-title',text:it.title}),
+        el('span',{class:'li-author',text:it.author}),
+        el('span',{class:'li-src',text:internal?'↳ '+it.src:it.src+' ↗'}));
+      if(internal){ card.onclick=(e)=>{ e.preventDefault(); location.hash=it.url; }; }
+      else { card.target='_blank'; card.rel='noopener noreferrer'; }
+      grid.append(card);
+    });
+    sec.append(grid); frag.append(sec);
+  });
+  body.replaceChildren(frag);
+}
+function showLibrary(){ renderLibrary(); show('#library'); scrollTo(0,0); }
+
+/* entry + back wiring */
+$('#theologyCard').onclick = () => location.hash='#/theology';
+$('#libraryCard').onclick  = () => location.hash='#/library';
+$('#theologyBack').onclick = () => location.hash='';
+$('#libraryBack').onclick  = () => location.hash='';
 
 /* ---- toast ---- */
 let toastT;

@@ -305,6 +305,36 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .dr-synax{font-family:'Amiri',serif;font-size:calc(1.18rem * var(--reader-scale));line-height:2;color:var(--ink);white-space:pre-line}
 .dr-synax-title{color:var(--ink);font-family:'Cairo',serif;font-weight:600;font-size:1.05rem;margin:10px 0 6px}
 
+/* ===== Theology + Library shared ===== */
+.section-note{color:var(--ink-soft);font-size:.9rem;line-height:1.8;background:var(--bg-sunk);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:4px 0 18px}
+.section-note b{color:var(--crimson)}
+
+/* Theology topics */
+.theology-body{display:flex;flex-direction:column;gap:14px;padding-bottom:24px}
+.th-topic{background:var(--bg-elev);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.th-head{width:100%;text-align:start;border:none;background:transparent;color:var(--ink);font-family:'Cairo',sans-serif;font-weight:700;font-size:1.12rem;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.th-head .chev{color:var(--gold);font-size:.95rem;transition:transform .2s}
+.th-topic.open .th-head .chev{transform:rotate(90deg)}
+.th-body{padding:0 18px 16px;display:none}
+.th-topic.open .th-body{display:block}
+.th-intro{font-family:'Amiri',serif;font-size:calc(1.2rem * var(--reader-scale));line-height:2.1;color:var(--ink);margin-bottom:10px}
+.th-verses{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.th-verses button{background:var(--bg-sunk);border:1px solid var(--line);border-radius:20px;padding:6px 14px;font-family:'Amiri',serif;font-size:1rem;color:var(--gold);transition:border-color .2s,color .2s}
+.th-verses button:hover{border-color:var(--gold);color:var(--crimson)}
+.th-more{display:inline-block;margin-top:6px;color:var(--royal);font-size:.85rem;text-decoration:none;font-weight:600}
+.th-more:hover{text-decoration:underline}
+
+/* Library */
+.library-body{padding-bottom:24px}
+.lib-cat{margin-bottom:22px}
+.lib-cat-title{color:var(--royal);font-family:'Cairo',sans-serif;font-weight:700;font-size:1.05rem;margin:0 2px 10px;display:flex;align-items:center;gap:8px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.lib-item{display:flex;flex-direction:column;gap:4px;background:var(--bg-elev);border:1px solid var(--line);border-radius:14px;padding:14px 16px;text-decoration:none;color:var(--ink);transition:transform .1s,border-color .2s;box-shadow:var(--shadow)}
+.lib-item:hover{border-color:var(--gold);transform:translateY(-2px)}
+.lib-item .li-title{font-family:'Amiri',serif;font-size:1.15rem;color:var(--ink)}
+.lib-item .li-author{color:var(--ink-soft);font-size:.84rem}
+.lib-item .li-src{color:var(--gold);font-size:.76rem;margin-top:2px}
+
 @media(min-width:980px){
   :root{--maxw:820px}
   .hero{padding-top:54px}
