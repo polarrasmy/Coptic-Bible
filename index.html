@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body data-theme="light">
 
@@ -86,6 +86,12 @@
           <span>ابحث في الكتاب… آية، كلمة، أو شاهد مثل «يوحنا ٣:١٦»</span>
         </button>
       </div>
+
+      <button class="start-banner" id="startCard">
+        <span class="sb-icon">🕊</span>
+        <span class="sb-text"><b>جديد في الإيمان؟ ابدأ من هنا</b><small>مين هو المسيح · إزاي تبدأ تقرأ الكتاب · خطوات أولى</small></span>
+        <span class="sb-arrow">‹</span>
+      </button>
 
       <article class="votd" id="votd">
         <div class="votd-label"><span>✦</span> آية اليوم</div>
@@ -224,6 +230,16 @@
       <div class="coptic-body" id="copticBody"></div>
     </section>
 
+    <!-- Beginner guide (ابدأ من هنا): original welcoming orientation, hosted on-site -->
+    <section class="theology" id="start" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="startBack">‹ الرئيسية</button>
+        <h2>ابدأ من هنا — دليل المبتدئ</h2>
+      </div>
+      <p class="section-note">لو بتكتشف المسيح لأول مرة، أو راجع من بعيد — أهلاً بيك. خطوات بسيطة، والآيات تفتح في القارئ. ولأي سؤال أعمق، كنيسة قريبة وأبٌ كاهن أحسن رفيق. 🕊️</p>
+      <div class="theology-body" id="startBody"></div>
+    </section>
+
     <!-- Loading / error -->
     <div class="state" id="loading" hidden><div class="spinner"></div><span>…جارٍ التحميل</span></div>
     <div class="state error" id="errorState" hidden>
@@ -264,6 +280,6 @@
     <p class="footer-note">نور الكلمة · نسخة أولى — للقراءة الشخصية والكنسية.</p>
   </footer>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

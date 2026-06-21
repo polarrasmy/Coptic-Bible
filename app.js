@@ -168,7 +168,7 @@ async function getChapter(b, c){
 }
 
 /* ---- views ---- */
-const VIEWS = ['#home','#chapters','#reader','#daily','#theology','#library','#liturgies','#coptic','#loading','#errorState'];
+const VIEWS = ['#home','#chapters','#reader','#daily','#theology','#library','#liturgies','#coptic','#start','#loading','#errorState'];
 function show(id){ VIEWS.forEach(v => $(v).hidden = (v !== id)); }
 
 function renderChapters(b){
@@ -257,6 +257,7 @@ function route(){
   if(view==='library') return showLibrary();
   if(view==='liturgies') return showLiturgies();
   if(view==='coptic') return showCoptic();
+  if(view==='start') return showStart();
   show('#home'); scrollTo(0,0);
 }
 addEventListener('hashchange', route);
@@ -614,6 +615,51 @@ $('#liturgiesCard').onclick = () => location.hash='#/liturgies';
 $('#copticCard').onclick    = () => location.hash='#/coptic';
 $('#liturgiesBack').onclick = () => location.hash='';
 $('#copticBack').onclick    = () => location.hash='';
+
+/* ---- beginner guide (ابدأ من هنا): original welcoming orientation for seekers ---- */
+const START_GUIDE = [
+  { title:'أهلاً بيك 🕊️',
+    intro:'لو قلبك بيتحرّك ناحية المسيح — دي مش صدفة. الخطوة الأبسط إنك تتعرّف عليه من كلامه هو: ابدأ بإنجيل يوحنا، وكلّم الله ببساطة كأنك بتكلّم أبوك.',
+    verses:[{l:'يوحنا ٣:١٦',b:43,c:3}], links:[{label:'افتح إنجيل يوحنا ←',hash:'#/read/43/1'}] },
+  { title:'مين هو يسوع المسيح؟',
+    intro:'بحسب الأناجيل: يسوع هو ابنُ الله الذي صار إنساناً، عاش بلا خطية، صُلب وقام من الموت لأجل خلاصنا، وهو الطريقُ إلى الآب.',
+    verses:[{l:'يوحنا ١:١',b:43,c:1},{l:'يوحنا ١٤:٦',b:43,c:14}] },
+  { title:'إزاي تبدأ تقرأ الكتاب المقدّس؟',
+    intro:'ابدأ بالعهد الجديد: إنجيل يوحنا، ثم مرقس، ثم أعمال الرسل — ومعاهم المزامير للصلاة. اقرأ القليلَ يومياً بتأنٍّ، واطلب من الله أن يفتح قلبك.',
+    verses:[{l:'يوحنا ١',b:43,c:1},{l:'مرقس ١',b:41,c:1},{l:'مزمور ١',b:19,c:1}] },
+  { title:'الصلاة — إزاي تكلّم الله؟',
+    intro:'الصلاةُ ببساطةٍ حديثٌ مع الله. علّمنا المسيحُ صلاةَ «أبانا الذي في السموات». مش محتاج كلاماً صعباً — كلّمه بصدقٍ وثقة.',
+    verses:[{l:'متى ٦:٩',b:40,c:6}] },
+  { title:'خطوات عملية أولى',
+    intro:'(١) اقرأ يومياً من الإنجيل. (٢) صلِّ كلَّ يوم. (٣) دوّر على كنيسةٍ قريبةٍ واحضُر القدّاس. (٤) اتكلّم مع أبٍ كاهن — هو هيرافقك بحكمة. كل رحلةٍ تبدأ بخطوة.',
+    links:[{label:'تعرّف على القداسات ←',hash:'#/liturgies'}] },
+  { title:'إيه المسيحية باختصار؟',
+    intro:'الإيمانُ بإلهٍ واحدٍ مثلّثِ الأقانيم؛ ومحبةُ اللهِ التي ظهرت في تجسّدِ الابنِ وفدائِه على الصليبِ وقيامتِه؛ والحياةُ الجديدةُ معه في كنيسته.',
+    links:[{label:'افتح قسم العقيدة ←',hash:'#/theology'}] },
+];
+
+/** Render the beginner guide (reuses the .th-topic accordion; supports verse + internal links). */
+function renderStart(){
+  const body=$('#startBody'); const frag=document.createDocumentFragment();
+  START_GUIDE.forEach((t,i)=>{
+    const wrap=el('div',{class:'th-topic'+(i===0?' open':'')});
+    const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
+    head.onclick=()=>wrap.classList.toggle('open');
+    const inner=el('div',{class:'th-body'});
+    inner.append(el('div',{class:'th-intro',text:t.intro}));
+    if(t.verses || t.links){
+      const row=el('div',{class:'th-verses'});
+      (t.verses||[]).forEach(v=>{ const b=el('button',{text:v.l}); b.onclick=()=>location.hash=`#/read/${v.b}/${v.c}`; row.append(b); });
+      (t.links||[]).forEach(L=>{ const b=el('button',{text:L.label}); b.onclick=()=>location.hash=L.hash; row.append(b); });
+      inner.append(row);
+    }
+    wrap.append(head,inner); frag.append(wrap);
+  });
+  body.replaceChildren(frag);
+}
+function showStart(){ renderStart(); show('#start'); scrollTo(0,0); }
+$('#startCard').onclick = () => location.hash='#/start';
+$('#startBack').onclick = () => location.hash='';
 
 /* ---- toast ---- */
 let toastT;

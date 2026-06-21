@@ -270,6 +270,20 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .footer{max-width:var(--maxw);margin:0 auto;padding:30px 18px 50px;text-align:center;color:var(--ink-soft);font-size:.78rem;border-top:1px solid var(--line)}
 .footer-note{margin-top:6px;opacity:.8}
 
+/* ===== Beginner banner (home) ===== */
+.start-banner{
+  display:flex;align-items:center;gap:14px;width:100%;margin:16px 0 2px;text-align:start;
+  background:linear-gradient(120deg,color-mix(in srgb,var(--gold) 16%,var(--bg-elev)),var(--bg-elev));
+  border:1px solid var(--gold);border-radius:18px;padding:16px 20px;
+  box-shadow:var(--shadow);transition:transform .1s,box-shadow .2s;cursor:pointer;
+}
+.start-banner:hover{transform:translateY(-2px)}
+.start-banner .sb-icon{font-size:1.8rem;flex:none}
+.start-banner .sb-text{flex:1;display:flex;flex-direction:column;gap:2px}
+.start-banner .sb-text b{font-family:'Cairo',sans-serif;font-size:1.08rem;color:var(--ink)}
+.start-banner .sb-text small{color:var(--ink-soft);font-size:.84rem}
+.start-banner .sb-arrow{color:var(--gold);font-size:1.3rem;flex:none}
+
 /* ===== Today cards (home) ===== */
 .today-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
 .today-card{
