@@ -10,9 +10,9 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=2" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body data-theme="light">
 
@@ -60,10 +60,31 @@
     <!-- Home / welcome -->
     <section class="home" id="home">
       <div class="hero">
-        <div class="hero-cross" aria-hidden="true">✛</div>
+        <div class="hero-book" aria-hidden="true">
+          <svg viewBox="0 0 120 96" fill="none">
+            <defs>
+              <radialGradient id="glow" cx="50%" cy="38%" r="55%">
+                <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.55"/>
+                <stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="60" cy="36" r="46" fill="url(#glow)"/>
+            <g stroke="var(--gold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 30 L16 14 M8 22 L24 22"/>
+              <path d="M60 78 C60 64 40 60 22 62 L22 84 C40 82 60 86 60 96 C60 86 80 82 98 84 L98 62 C80 60 60 64 60 78 Z" fill="var(--bg-elev)"/>
+              <path d="M60 78 L60 96"/>
+              <path d="M30 70 H50 M30 76 H50 M70 70 H90 M70 76 H90" stroke-width="1.6" opacity="0.7"/>
+            </g>
+          </svg>
+        </div>
         <h1 class="hero-title">نور الكلمة</h1>
         <p class="hero-sub">«كلمةُ الله نورٌ لطريقي»</p>
         <p class="hero-translation">الكتاب المقدّس كامل · العهد القديم والجديد والأسفار القانونية الثانية · ترجمة فان دايك</p>
+
+        <button class="hero-search" id="heroSearch" aria-label="ابحث">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <span>ابحث في الكتاب… آية، كلمة، أو شاهد مثل «يوحنا ٣:١٦»</span>
+        </button>
       </div>
 
       <article class="votd" id="votd">
@@ -176,6 +197,6 @@
     <p class="footer-note">نور الكلمة · نسخة أولى — للقراءة الشخصية والكنسية.</p>
   </footer>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

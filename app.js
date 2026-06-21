@@ -308,6 +308,7 @@ $('#quicklinks').addEventListener('click', e => {
 const sOverlay=$('#searchOverlay'), sInput=$('#searchInput'), sRes=$('#searchResults');
 function openSearch(o){ sOverlay.hidden=!o; if(o){ sInput.value=''; sRes.replaceChildren(); setTimeout(()=>sInput.focus(),50);} }
 $('#searchBtn').onclick=()=>openSearch(true);
+{ const hs=$('#heroSearch'); if(hs) hs.onclick=()=>openSearch(true); }
 $('#searchClose').onclick=()=>openSearch(false);
 sOverlay.addEventListener('click', e=>{ if(e.target===sOverlay) openSearch(false); });
 addEventListener('keydown', e=>{ if(e.key==='Escape') openSearch(false); });
