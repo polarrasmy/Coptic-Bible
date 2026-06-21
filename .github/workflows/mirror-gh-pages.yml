@@ -1,0 +1,21 @@
+name: Mirror main to gh-pages
+
+# GitHub Pages serves the gh-pages branch. This keeps it identical to main on
+# every push (including the daily readings update), using the built-in token.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Force gh-pages to match main
+        run: git push origin HEAD:gh-pages --force
