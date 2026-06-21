@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body data-theme="light">
 
@@ -119,6 +119,19 @@
         </button>
       </div>
 
+      <div class="today-row" id="discoverRow2">
+        <button class="today-card" id="liturgiesCard">
+          <span class="tc-label">⛪ القداسات</span>
+          <span class="tc-main">إيه بنصلّي اليوم · الفرق بينهم</span>
+          <span class="tc-sub">الباسيلي · الغريغوري · الكيرلسي</span>
+        </button>
+        <button class="today-card" id="copticCard">
+          <span class="tc-label">Ⲁ تعليم اللغة القبطية</span>
+          <span class="tc-main">الأبجدية والنطق + كلمات</span>
+          <span class="tc-sub">بالعربي والإنجليزي</span>
+        </button>
+      </div>
+
       <div class="home-actions">
         <button class="primary-btn" id="continueBtn" hidden></button>
         <button class="ghost-btn" id="browseBtn">تصفّح الأسفار</button>
@@ -190,6 +203,27 @@
       <div class="library-body" id="libraryBody"></div>
     </section>
 
+    <!-- Liturgies (القداسات): original explainers, hosted on-site -->
+    <section class="theology" id="liturgies" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="liturgiesBack">‹ الرئيسية</button>
+        <h2>القداسات</h2>
+      </div>
+      <p class="coptic-date" id="liturgyToday"></p>
+      <p class="section-note">القداسات الثلاثة في الكنيسة القبطية ومتى يُصلّى كلٌّ منها. النصّ الكامل للقداس والمردات في الكتب الطقسية. 🕯️</p>
+      <div class="theology-body" id="liturgiesBody"></div>
+    </section>
+
+    <!-- Coptic language (تعليم القبطية): original lesson, hosted on-site -->
+    <section class="coptic" id="coptic" hidden>
+      <div class="reader-top">
+        <button class="back-link" id="copticBack">‹ الرئيسية</button>
+        <h2>تعليم اللغة القبطية</h2>
+      </div>
+      <p class="section-note">الأبجدية القبطية ونطقها بالعربي والإنجليزي + كلمات وتحيّات شائعة. درس مبتدئ. Ⲁ</p>
+      <div class="coptic-body" id="copticBody"></div>
+    </section>
+
     <!-- Loading / error -->
     <div class="state" id="loading" hidden><div class="spinner"></div><span>…جارٍ التحميل</span></div>
     <div class="state error" id="errorState" hidden>
@@ -230,6 +264,6 @@
     <p class="footer-note">نور الكلمة · نسخة أولى — للقراءة الشخصية والكنسية.</p>
   </footer>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

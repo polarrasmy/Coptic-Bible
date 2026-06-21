@@ -168,7 +168,7 @@ async function getChapter(b, c){
 }
 
 /* ---- views ---- */
-const VIEWS = ['#home','#chapters','#reader','#daily','#theology','#library','#loading','#errorState'];
+const VIEWS = ['#home','#chapters','#reader','#daily','#theology','#library','#liturgies','#coptic','#loading','#errorState'];
 function show(id){ VIEWS.forEach(v => $(v).hidden = (v !== id)); }
 
 function renderChapters(b){
@@ -255,6 +255,8 @@ function route(){
   if(view==='daily') return showDaily();
   if(view==='theology') return showTheology();
   if(view==='library') return showLibrary();
+  if(view==='liturgies') return showLiturgies();
+  if(view==='coptic') return showCoptic();
   show('#home'); scrollTo(0,0);
 }
 addEventListener('hashchange', route);
@@ -536,6 +538,82 @@ $('#theologyCard').onclick = () => location.hash='#/theology';
 $('#libraryCard').onclick  = () => location.hash='#/library';
 $('#theologyBack').onclick = () => location.hash='';
 $('#libraryBack').onclick  = () => location.hash='';
+
+/* ---- liturgies (القداسات): original explainers of the 3 Coptic liturgies, hosted on-site ---- */
+const LITURGIES = [
+  { title:'القداسات الثلاثة — مقدّمة',
+    intro:'في الكنيسة القبطية ثلاثةُ قداساتٍ (ليتورجيات): الباسيليّ والغريغوريّ والكيرلسيّ. تشترك كلُّها في نفسِ الترتيبِ العام، وتختلفُ أساساً في صلواتِ الكاهنِ — وبخاصةٍ «الأنافورا» (صلاةُ التقديس). يسبقُها رفعُ بخورٍ عشيةً وباكراً.' },
+  { title:'القُدّاس الباسيليّ',
+    intro:'المنسوبُ للقدّيس باسيليوس الكبير — الأكثرُ استخداماً على مدارِ السنةِ وفي معظمِ الآحاد. صلواتُه موجَّهةٌ إلى الآبِ، بالابنِ، في الروحِ القُدُس.' },
+  { title:'القُدّاس الغريغوريّ',
+    intro:'المنسوبُ للقدّيس غريغوريوس النزينزيّ — يُصلَّى في الأعيادِ السيّديّةِ والمناسباتِ الفرايحيّة (الميلاد، الغطاس، القيامة، وأحياناً الأفراح). مميَّزٌ بأنّ صلواتِه موجَّهةٌ إلى الابنِ الكلمةِ مباشرةً.' },
+  { title:'القُدّاس الكيرلسيّ',
+    intro:'المنسوبُ للقدّيس كيرلس الكبير (وأصلُه لليتورجيّةِ القدّيس مرقس الرسول) — أقدمُ القداساتِ وأطولُها، يُصلَّى غالباً في الصومِ الكبيرِ وشهرِ كيهك وفي بعضِ الأديرة.' },
+  { title:'ترتيب القُدّاس باختصار',
+    intro:'رفعُ بخورٍ (عشيةً/باكراً) ← قُدّاسُ الموعوظين «ليتورجيّةُ الكلمة»: البولس، الكاثوليكون، الإبركسيس، السنكسار، ثم المزمورُ والإنجيل ← قُدّاسُ المؤمنين: صلاةُ الصلح، الأنافورا (التقديس)، القِسمة، ثم التناوُل. وقراءاتُ قُدّاسِ اليوم تلاقيها في «قراءات اليوم».',
+    daily:true },
+];
+
+/** Render the liturgies accordion (reuses the theology .th-topic markup). */
+function renderLiturgies(){
+  const body=$('#liturgiesBody'); const frag=document.createDocumentFragment();
+  LITURGIES.forEach((t,i)=>{
+    const wrap=el('div',{class:'th-topic'+(i===0?' open':'')});
+    const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
+    head.onclick=()=>wrap.classList.toggle('open');
+    const inner=el('div',{class:'th-body'});
+    inner.append(el('div',{class:'th-intro',text:t.intro}));
+    if(t.daily){ const row=el('div',{class:'th-verses'}); const b=el('button',{text:'قراءات قُدّاس اليوم ←'}); b.onclick=()=>location.hash='#/daily'; row.append(b); inner.append(row); }
+    wrap.append(head,inner); frag.append(wrap);
+  });
+  body.replaceChildren(frag);
+}
+/** Show the liturgies view; stamps today's Coptic date from the cached Katameros data. */
+async function showLiturgies(){
+  renderLiturgies();
+  try{ const d=await getDaily(); if(d.copticDate) $('#liturgyToday').textContent=`التاريخ القبطي اليوم · ${d.copticDate}`; }catch{}
+  show('#liturgies'); scrollTo(0,0);
+}
+
+/* ---- Coptic language lesson (تعليم القبطية): alphabet + common liturgical vocabulary ---- */
+const COPTIC_ALPHABET = [
+  {g:'Ⲁ',n:'ألفا',s:'a'},{g:'Ⲃ',n:'ڤيتا',s:'v / b'},{g:'Ⲅ',n:'غَمّا',s:'g / gh'},{g:'Ⲇ',n:'دَلدا',s:'d'},
+  {g:'Ⲉ',n:'إي',s:'e'},{g:'Ⲋ',n:'صو',s:'(٦)'},{g:'Ⲍ',n:'زيتا',s:'z'},{g:'Ⲏ',n:'إيتا',s:'ī'},
+  {g:'Ⲑ',n:'ثيتا',s:'th'},{g:'Ⲓ',n:'يوتا',s:'i'},{g:'Ⲕ',n:'كابّا',s:'k'},{g:'Ⲗ',n:'لَولا',s:'l'},
+  {g:'Ⲙ',n:'مي',s:'m'},{g:'Ⲛ',n:'ني',s:'n'},{g:'Ⲝ',n:'إكْسي',s:'ks'},{g:'Ⲟ',n:'أو',s:'o'},
+  {g:'Ⲡ',n:'پي',s:'p'},{g:'Ⲣ',n:'رو',s:'r'},{g:'Ⲥ',n:'سيما',s:'s'},{g:'Ⲧ',n:'تاڤ',s:'t'},
+  {g:'Ⲩ',n:'إبسيلون',s:'u / i'},{g:'Ⲫ',n:'في',s:'f'},{g:'Ⲭ',n:'خي',s:'kh'},{g:'Ⲯ',n:'إبْسي',s:'ps'},
+  {g:'Ⲱ',n:'أوو',s:'ō'},{g:'Ϣ',n:'شاي',s:'sh'},{g:'Ϥ',n:'فاي',s:'f'},{g:'Ϧ',n:'خاي',s:'kh'},
+  {g:'Ϩ',n:'هوري',s:'h'},{g:'Ϫ',n:'جَنجا',s:'j'},{g:'Ϭ',n:'تشيما',s:'ch'},{g:'Ϯ',n:'تي',s:'ti'},
+];
+const COPTIC_PHRASES = [
+  {cop:'Ⲕⲩⲣⲓⲉ ⲉⲗⲉⲏⲥⲟⲛ',ar:'يا ربُّ ارحم',en:'Lord, have mercy'},
+  {cop:'Ⲁⲗⲗⲏⲗⲟⲩⲓⲁ',ar:'هلليلويا',en:'Alleluia'},
+  {cop:'Ⲁⲙⲏⲛ',ar:'آمين',en:'Amen'},
+  {cop:'Ⲁⲅⲓⲟⲥ',ar:'قُدّوس',en:'Holy'},
+  {cop:'Ⲡⲓⲭⲣⲓⲥⲧⲟⲥ ⲁϥⲧⲱⲛϥ',ar:'المسيحُ قام',en:'Christ is risen'},
+  {cop:'Ⲡⲁϭⲟⲓⲥ',ar:'يا ربّي',en:'My Lord'},
+];
+
+/** Render the Coptic lesson: alphabet grid + a small set of common liturgical words. */
+function renderCoptic(){
+  const body=$('#copticBody'); body.replaceChildren();
+  body.append(el('div',{class:'cop-h',text:'الأبجدية القبطية (٣٢ حرفاً)'}));
+  const grid=el('div',{class:'cop-grid'});
+  COPTIC_ALPHABET.forEach(L=> grid.append(el('div',{class:'cop-letter'},
+    el('div',{class:'cop-glyph',text:L.g}), el('div',{class:'cop-name',text:L.n}), el('div',{class:'cop-sound',text:L.s}))));
+  body.append(grid);
+  body.append(el('div',{class:'cop-h',text:'كلمات وتحيّات شائعة'}));
+  COPTIC_PHRASES.forEach(p=> body.append(el('div',{class:'cop-phrase'},
+    el('span',{class:'cp-cop',text:p.cop}), el('span',{class:'cp-ar',text:p.ar}), el('span',{class:'cp-en',text:p.en}))));
+}
+function showCoptic(){ renderCoptic(); show('#coptic'); scrollTo(0,0); }
+
+/* entry + back wiring (liturgies, coptic) */
+$('#liturgiesCard').onclick = () => location.hash='#/liturgies';
+$('#copticCard').onclick    = () => location.hash='#/coptic';
+$('#liturgiesBack').onclick = () => location.hash='';
+$('#copticBack').onclick    = () => location.hash='';
 
 /* ---- toast ---- */
 let toastT;
