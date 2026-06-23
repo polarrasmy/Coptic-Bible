@@ -451,25 +451,14 @@ $('#saintCard').onclick = () => location.hash='#/daily';
 $('#dailyBack').onclick  = () => location.hash='';
 
 /* ---- theology (العقيدة): original short explainers + verse links + authoritative source ---- */
+// Doctrine topics = title + scripture references only (verbatim from source). No authored prose.
 const THEOLOGY = [
-  { title:'الثالوث القدّوس',
-    intro:'اللهُ واحدٌ في جوهره، مثلّثُ الأقانيم: الآبُ والابنُ والروحُ القُدُس — ثلاثةُ أقانيمَ متساوون في الجوهرِ والمجدِ والأزلية، إلهٌ واحدٌ لا ثلاثةُ آلهة.',
-    verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ١:١',b:43,c:1},{l:'٢كورنثوس ١٣:١٤',b:47,c:13}] },
-  { title:'سرّ التجسّد',
-    intro:'ابنُ اللهِ الكلمةُ صار إنساناً كاملاً من غيرِ أن يتغيّرَ لاهوتُه؛ اتّحدَ اللاهوتُ بالناسوتِ اتّحاداً بغيرِ اختلاطٍ ولا امتزاجٍ ولا تغيير — طبيعةٌ واحدةٌ من طبيعتين (بحسبِ الإيمانِ القبطيِّ الأرثوذكسي)، إلهٌ كاملٌ وإنسانٌ كامل.',
-    verses:[{l:'يوحنا ١:١٤',b:43,c:1},{l:'فيلبي ٢:٦',b:50,c:2},{l:'١تيموثاوس ٣:١٦',b:54,c:3}] },
-  { title:'الفداء والخلاص',
-    intro:'بصليبِ المسيحِ وقيامتِه افتدانا من الخطيةِ والموتِ وصالحَنا مع الآب. الخلاصُ نعمةٌ تُقبَلُ بالإيمانِ العاملِ بالمحبة، ونحياهُ في الكنيسةِ وأسرارِها.',
-    verses:[{l:'يوحنا ٣:١٦',b:43,c:3},{l:'رومية ٥:٨',b:45,c:5},{l:'أفسس ٢:٨',b:49,c:2}] },
-  { title:'الأسرار السبعة',
-    intro:'الأسرارُ المقدّسةُ سبعة: المعموديةُ، الميرونُ، الإفخارستيا (التناوُل)، التوبةُ والاعترافُ، مسحةُ المرضى، الكهنوتُ، الزيجة — وسائطُ نعمةٍ منظورةٌ لبركةٍ غيرِ منظورة.',
-    verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ٦:٥٤',b:43,c:6},{l:'يعقوب ٥:١٤',b:59,c:5}] },
-  { title:'المجامع المسكونية',
-    intro:'تعترفُ الكنيسةُ القبطيةُ الأرثوذكسيةُ بالمجامعِ المسكونيةِ الثلاثةِ الأولى: نيقية (٣٢٥م) ضدّ آريوس، والقسطنطينية (٣٨١م)، وأفسس (٤٣١م) ضدّ نسطور — التي ثبّتت الإيمانَ بلاهوتِ الابنِ والروحِ القدسِ ووحدانيةِ شخصِ المسيح، ومنها قانونُ الإيمان.',
-    verses:[{l:'يوحنا ١٧:٢١',b:43,c:17},{l:'أفسس ٤:٥',b:49,c:4}] },
-  { title:'الكتاب المقدّس والوحي',
-    intro:'الكتابُ المقدّسُ كلمةُ اللهِ الموحى بها: أسفارُ العهدِ القديمِ والجديدِ والأسفارِ القانونيةِ الثانية، تقرؤها الكنيسةُ في ضوءِ التقليدِ الرسوليِّ وتفسيرِ الآباء.',
-    verses:[{l:'٢تيموثاوس ٣:١٦',b:55,c:3},{l:'٢بطرس ١:٢١',b:61,c:1}] },
+  { title:'الثالوث القدّوس', verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ١:١',b:43,c:1},{l:'٢كورنثوس ١٣:١٤',b:47,c:13}] },
+  { title:'سرّ التجسّد', verses:[{l:'يوحنا ١:١٤',b:43,c:1},{l:'فيلبي ٢:٦',b:50,c:2},{l:'١تيموثاوس ٣:١٦',b:54,c:3}] },
+  { title:'الفداء والخلاص', verses:[{l:'يوحنا ٣:١٦',b:43,c:3},{l:'رومية ٥:٨',b:45,c:5},{l:'أفسس ٢:٨',b:49,c:2}] },
+  { title:'الأسرار السبعة', verses:[{l:'متى ٢٨:١٩',b:40,c:28},{l:'يوحنا ٦:٥٤',b:43,c:6},{l:'يعقوب ٥:١٤',b:59,c:5}] },
+  { title:'المجامع المسكونية', verses:[{l:'يوحنا ١٧:٢١',b:43,c:17},{l:'أفسس ٤:٥',b:49,c:4}] },
+  { title:'الكتاب المقدّس والوحي', verses:[{l:'٢تيموثاوس ٣:١٦',b:55,c:3},{l:'٢بطرس ١:٢١',b:61,c:1}] },
 ];
 
 function renderTheology(){
@@ -479,11 +468,10 @@ function renderTheology(){
     const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
     head.onclick=()=>wrap.classList.toggle('open');
     const inner=el('div',{class:'th-body'});
-    inner.append(el('div',{class:'th-intro',text:t.intro}));
     const vrow=el('div',{class:'th-verses'});
-    t.verses.forEach(v=>{ const btn=el('button',{text:v.l}); btn.onclick=()=>{ location.hash=`#/read/${v.b}/${v.c}`; }; vrow.append(btn); });
+    (t.verses||[]).forEach(v=>{ const btn=el('button',{text:v.l}); btn.onclick=()=>{ location.hash=`#/read/${v.b}/${v.c}`; }; vrow.append(btn); });
     inner.append(vrow);
-    inner.append(el('a',{class:'th-more',href:'https://st-takla.org',target:'_blank',rel:'noopener noreferrer',text:'اقرأ أكثر من مصدر معتمد ↗'}));
+    inner.append(el('a',{class:'th-more',href:'https://st-takla.org',target:'_blank',rel:'noopener noreferrer',text:'النص الكامل من مصدر معتمد ↗'}));
     wrap.append(head,inner); frag.append(wrap);
   });
   body.replaceChildren(frag);
@@ -541,18 +529,12 @@ $('#theologyBack').onclick = () => location.hash='';
 $('#libraryBack').onclick  = () => location.hash='';
 
 /* ---- liturgies (القداسات): original explainers of the 3 Coptic liturgies, hosted on-site ---- */
+// Liturgy titles + links to authoritative source text (no authored descriptions).
 const LITURGIES = [
-  { title:'القداسات الثلاثة — مقدّمة',
-    intro:'في الكنيسة القبطية ثلاثةُ قداساتٍ (ليتورجيات): الباسيليّ والغريغوريّ والكيرلسيّ. تشترك كلُّها في نفسِ الترتيبِ العام، وتختلفُ أساساً في صلواتِ الكاهنِ — وبخاصةٍ «الأنافورا» (صلاةُ التقديس). يسبقُها رفعُ بخورٍ عشيةً وباكراً.' },
-  { title:'القُدّاس الباسيليّ',
-    intro:'المنسوبُ للقدّيس باسيليوس الكبير — الأكثرُ استخداماً على مدارِ السنةِ وفي معظمِ الآحاد. صلواتُه موجَّهةٌ إلى الآبِ، بالابنِ، في الروحِ القُدُس.' },
-  { title:'القُدّاس الغريغوريّ',
-    intro:'المنسوبُ للقدّيس غريغوريوس النزينزيّ — يُصلَّى في الأعيادِ السيّديّةِ والمناسباتِ الفرايحيّة (الميلاد، الغطاس، القيامة، وأحياناً الأفراح). مميَّزٌ بأنّ صلواتِه موجَّهةٌ إلى الابنِ الكلمةِ مباشرةً.' },
-  { title:'القُدّاس الكيرلسيّ',
-    intro:'المنسوبُ للقدّيس كيرلس الكبير (وأصلُه لليتورجيّةِ القدّيس مرقس الرسول) — أقدمُ القداساتِ وأطولُها، يُصلَّى غالباً في الصومِ الكبيرِ وشهرِ كيهك وفي بعضِ الأديرة.' },
-  { title:'ترتيب القُدّاس باختصار',
-    intro:'رفعُ بخورٍ (عشيةً/باكراً) ← قُدّاسُ الموعوظين «ليتورجيّةُ الكلمة»: البولس، الكاثوليكون، الإبركسيس، السنكسار، ثم المزمورُ والإنجيل ← قُدّاسُ المؤمنين: صلاةُ الصلح، الأنافورا (التقديس)، القِسمة، ثم التناوُل. وقراءاتُ قُدّاسِ اليوم تلاقيها في «قراءات اليوم».',
-    daily:true },
+  { title:'القُدّاس الباسيليّ' },
+  { title:'القُدّاس الغريغوريّ' },
+  { title:'القُدّاس الكيرلسيّ' },
+  { title:'ترتيب القُدّاس وقراءاته', daily:true },
 ];
 
 /** Render the liturgies accordion (reuses the theology .th-topic markup). */
@@ -563,8 +545,10 @@ function renderLiturgies(){
     const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
     head.onclick=()=>wrap.classList.toggle('open');
     const inner=el('div',{class:'th-body'});
-    inner.append(el('div',{class:'th-intro',text:t.intro}));
-    if(t.daily){ const row=el('div',{class:'th-verses'}); const b=el('button',{text:'قراءات قُدّاس اليوم ←'}); b.onclick=()=>location.hash='#/daily'; row.append(b); inner.append(row); }
+    const row=el('div',{class:'th-verses'});
+    if(t.daily){ const b=el('button',{text:'قراءات قُدّاس اليوم ←'}); b.onclick=()=>location.hash='#/daily'; row.append(b); }
+    inner.append(row);
+    inner.append(el('a',{class:'th-more',href:'https://st-takla.org',target:'_blank',rel:'noopener noreferrer',text:'نصّ القُدّاس من مصدر معتمد ↗'}));
     wrap.append(head,inner); frag.append(wrap);
   });
   body.replaceChildren(frag);
@@ -617,25 +601,13 @@ $('#liturgiesBack').onclick = () => location.hash='';
 $('#copticBack').onclick    = () => location.hash='';
 
 /* ---- beginner guide (ابدأ من هنا): original welcoming orientation for seekers ---- */
+// Seeker reading path = scripture references + navigation only (no authored prose).
 const START_GUIDE = [
-  { title:'أهلاً بيك 🕊️',
-    intro:'لو قلبك بيتحرّك ناحية المسيح — دي مش صدفة. الخطوة الأبسط إنك تتعرّف عليه من كلامه هو: ابدأ بإنجيل يوحنا، وكلّم الله ببساطة كأنك بتكلّم أبوك.',
-    verses:[{l:'يوحنا ٣:١٦',b:43,c:3}], links:[{label:'افتح إنجيل يوحنا ←',hash:'#/read/43/1'}] },
-  { title:'مين هو يسوع المسيح؟',
-    intro:'بحسب الأناجيل: يسوع هو ابنُ الله الذي صار إنساناً، عاش بلا خطية، صُلب وقام من الموت لأجل خلاصنا، وهو الطريقُ إلى الآب.',
-    verses:[{l:'يوحنا ١:١',b:43,c:1},{l:'يوحنا ١٤:٦',b:43,c:14}] },
-  { title:'إزاي تبدأ تقرأ الكتاب المقدّس؟',
-    intro:'ابدأ بالعهد الجديد: إنجيل يوحنا، ثم مرقس، ثم أعمال الرسل — ومعاهم المزامير للصلاة. اقرأ القليلَ يومياً بتأنٍّ، واطلب من الله أن يفتح قلبك.',
-    verses:[{l:'يوحنا ١',b:43,c:1},{l:'مرقس ١',b:41,c:1},{l:'مزمور ١',b:19,c:1}] },
-  { title:'الصلاة — إزاي تكلّم الله؟',
-    intro:'الصلاةُ ببساطةٍ حديثٌ مع الله. علّمنا المسيحُ صلاةَ «أبانا الذي في السموات». مش محتاج كلاماً صعباً — كلّمه بصدقٍ وثقة.',
-    verses:[{l:'متى ٦:٩',b:40,c:6}] },
-  { title:'خطوات عملية أولى',
-    intro:'(١) اقرأ يومياً من الإنجيل. (٢) صلِّ كلَّ يوم. (٣) دوّر على كنيسةٍ قريبةٍ واحضُر القدّاس. (٤) اتكلّم مع أبٍ كاهن — هو هيرافقك بحكمة. كل رحلةٍ تبدأ بخطوة.',
-    links:[{label:'تعرّف على القداسات ←',hash:'#/liturgies'}] },
-  { title:'إيه المسيحية باختصار؟',
-    intro:'الإيمانُ بإلهٍ واحدٍ مثلّثِ الأقانيم؛ ومحبةُ اللهِ التي ظهرت في تجسّدِ الابنِ وفدائِه على الصليبِ وقيامتِه؛ والحياةُ الجديدةُ معه في كنيسته.',
-    links:[{label:'افتح قسم العقيدة ←',hash:'#/theology'}] },
+  { title:'ابدأ بإنجيل يوحنا', verses:[{l:'يوحنا ١',b:43,c:1}], links:[{label:'افتح الإنجيل ←',hash:'#/read/43/1'}] },
+  { title:'مَن هو يسوع المسيح؟ — الشواهد', verses:[{l:'يوحنا ١:١',b:43,c:1},{l:'يوحنا ١٤:٦',b:43,c:14}] },
+  { title:'خطة قراءة للمبتدئ', verses:[{l:'يوحنا ١',b:43,c:1},{l:'مرقس ١',b:41,c:1},{l:'مزمور ١',b:19,c:1}] },
+  { title:'الصلاة الربّانية', verses:[{l:'متى ٦:٩',b:40,c:6}] },
+  { title:'العقيدة — الشواهد', links:[{label:'افتح قسم العقيدة ←',hash:'#/theology'}] },
 ];
 
 /** Render the beginner guide (reuses the .th-topic accordion; supports verse + internal links). */
@@ -646,7 +618,6 @@ function renderStart(){
     const head=el('button',{class:'th-head'},el('span',{text:t.title}),el('span',{class:'chev',text:'‹'}));
     head.onclick=()=>wrap.classList.toggle('open');
     const inner=el('div',{class:'th-body'});
-    inner.append(el('div',{class:'th-intro',text:t.intro}));
     if(t.verses || t.links){
       const row=el('div',{class:'th-verses'});
       (t.verses||[]).forEach(v=>{ const b=el('button',{text:v.l}); b.onclick=()=>location.hash=`#/read/${v.b}/${v.c}`; row.append(b); });
